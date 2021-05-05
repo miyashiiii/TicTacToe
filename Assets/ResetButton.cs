@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Reset : MonoBehaviour
+public class ResetButton : MonoBehaviour
 {
     public void OnClick()
     {
