@@ -8,10 +8,10 @@ public static class Board
 {
     private static MarkManager.Mark _currentMark;
 
-    private const int StatusInplay = 0;
+    private const int StatusInPlay = 0;
     private const int StatusFinish = 1;
 
-    private static int _status = StatusInplay;
+    private static int _status = StatusInPlay;
 
     private static GameObject _srcObj;
 
@@ -40,7 +40,7 @@ public static class Board
         };
 
         _currentMark = MarkManager.Circle;
-        _status = StatusInplay;
+        _status = StatusInPlay;
         ResultText.GetComponent<Text>().text = "";
         MarkManager.SetOpponent();
     }
@@ -112,11 +112,11 @@ public static class Board
         _board[squareId] = _currentMark;
 
 
-        var newObj = Object.Instantiate(_currentMark.obj, objPos, _currentMark.obj.transform.rotation);
+        var newObj = Object.Instantiate(_currentMark.Obj, objPos, _currentMark.Obj.transform.rotation);
         newObj.transform.SetParent(Canvas.transform);
         _objects[squareId] = newObj;
 
-        _currentMark = _currentMark.opponent;
+        _currentMark = _currentMark.Opponent;
 
         CheckFinish();
     }
