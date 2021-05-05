@@ -12,7 +12,7 @@ public class SquareController : MonoBehaviour
         Board.Init();
     }
 
-    public void onClickAct()
+    public void OnClick()
     {
         Debug.Log("Board Update");
 
