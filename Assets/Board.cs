@@ -10,7 +10,7 @@ public static class Board
     private const int MarkCircle = 1;
     private const int MarkCross = 2;
 
-    private static int _nextMark = MarkCircle;
+    private static int _nextMark;
 
     private const int StatusInplay = 0;
     private const int StatusFinish = 1;
@@ -43,9 +43,12 @@ public static class Board
             null, null, null,
             null, null, null
         };
+        _nextMark = MarkCircle;
+        _status = StatusInplay;
+        ResultText.GetComponent<Text>().text = "";
     }
 
-    private static readonly int[,] Lines = new int[,]
+    private static readonly int[,] Lines = 
     {
         {0, 1, 2},
         {3, 4, 5},
@@ -144,7 +147,5 @@ public static class Board
         }
 
         Init();
-        _status = StatusInplay;
-        ResultText.GetComponent<Text>().text = "";
     }
 }
