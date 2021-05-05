@@ -6,11 +6,7 @@ using UnityEngine.UI;
 
 public static class Board
 {
-    private const int MarkEmpty = 0;
-    private const int MarkCircle = 1;
-    private const int MarkCross = 2;
-
-    private static int _nextMark;
+    private static MarkManager.Mark _currentMark;
 
     private const int StatusInplay = 0;
     private const int StatusFinish = 1;
@@ -19,23 +15,22 @@ public static class Board
 
     private static GameObject _srcObj;
 
-    private static readonly GameObject Circle = GameObject.Find("Circle");
-    private static readonly GameObject Cross = GameObject.Find("Cross");
     private static readonly GameObject Canvas = GameObject.Find("Canvas");
     private static readonly GameObject ResultText = GameObject.Find("ResultText");
 
 
-    private static int[] _board;
+    private static MarkManager.Mark[] _board;
     private static GameObject[] _objects;
+
 
     public static void Init()
     {
         Debug.Log("Board Init");
-        _board = new[]
+        _board = new MarkManager.Mark[]
         {
-            MarkEmpty, MarkEmpty, MarkEmpty,
-            MarkEmpty, MarkEmpty, MarkEmpty,
-            MarkEmpty, MarkEmpty, MarkEmpty,
+            MarkManager.Empty, MarkManager.Empty, MarkManager.Empty,
+            MarkManager.Empty, MarkManager.Empty, MarkManager.Empty,
+            MarkManager.Empty, MarkManager.Empty, MarkManager.Empty,
         };
         _objects = new GameObject[]
         {
@@ -43,12 +38,14 @@ public static class Board
             null, null, null,
             null, null, null
         };
-        _nextMark = MarkCircle;
+
+        _currentMark = MarkManager.Circle;
         _status = StatusInplay;
         ResultText.GetComponent<Text>().text = "";
+        MarkManager.SetOpponent();
     }
 
-    private static readonly int[,] Lines = 
+    private static readonly int[,] Lines =
     {
         {0, 1, 2},
         {3, 4, 5},
@@ -60,12 +57,11 @@ public static class Board
         {2, 4, 6},
     };
 
-    private static void Finish(int winMark)
+    private static void Finish(MarkManager.Mark winMark)
     {
         Debug.Log("Finish");
-        var winnerStr = winMark == MarkCircle ? "○" : "×";
 
-        ResultText.GetComponent<Text>().text = "Winner: " + winnerStr;
+        ResultText.GetComponent<Text>().text = "Winner: " + winMark;
         _status = StatusFinish;
     }
 
@@ -82,17 +78,14 @@ public static class Board
             var mark2 = _board[square2];
             Debug.Log("squareID:" + square0 + square1 + square2 + ", mark:" + mark0 + mark1 + mark2);
 
-            if (
-                mark0 == MarkCircle && mark1 == MarkCircle && mark2 == MarkCircle)
+            if (mark0 == MarkManager.Empty)
             {
-                Finish(MarkCircle);
-                break;
+                continue;
             }
 
-            if (
-                mark0 == MarkCross && mark1 == MarkCross && mark2 == MarkCross)
+            if (mark1 == mark0 && mark2 == mark0)
             {
-                Finish(MarkCross);
+                Finish(mark0);
                 break;
             }
 
@@ -103,7 +96,7 @@ public static class Board
     public static void Update(int squareId, Vector2 objPos)
     {
         Debug.Log("Board Update");
-        if (_board[squareId] != MarkEmpty)
+        if (_board[squareId] != MarkManager.Empty)
         {
             return;
         }
@@ -113,24 +106,18 @@ public static class Board
             return;
         }
 
-        _board[squareId] = _nextMark;
+        Debug.Log("board:" + _board.Length);
+        Debug.Log("squareId:" + squareId);
+        Debug.Log("square:" + _board[squareId]);
+        _board[squareId] = _currentMark;
 
-        if (_nextMark == MarkCircle)
-        {
-            _srcObj = Circle;
-            _nextMark = MarkCross;
-        }
-        else
-        {
-            _srcObj = Cross;
-            _nextMark = MarkCircle;
-        }
 
-        var newObj = Object.Instantiate(_srcObj, objPos, Circle.transform.rotation);
+        var newObj = Object.Instantiate(_currentMark.obj, objPos, _currentMark.obj.transform.rotation);
         newObj.transform.SetParent(Canvas.transform);
-
-
         _objects[squareId] = newObj;
+
+        _currentMark = _currentMark.opponent;
+
         CheckFinish();
     }
 
