@@ -6,144 +6,145 @@ using UnityEngine.UI;
 
 public static class Board
 {
-    const int MARK_EMPTY = 0; 
-    const int MARK_CIRCLE = 1; 
-    const int MARK_CROSS = 2;
-    
-    static int nextMark=MARK_CIRCLE;
-    
-    const int STATUS_INPLAY=0;
-    const int STATUS_FINISH=1;
-    
-    static int status=STATUS_INPLAY;
-    
-    private static GameObject srcObj;
-    
-    static GameObject circle = GameObject.Find("Circle");
-    static GameObject cross = GameObject.Find("Cross");
-    static GameObject canvas = GameObject.Find("Canvas");
-    static GameObject resultText = GameObject.Find("ResultText");
- 
-    
-    static int[] board;
-    static GameObject[] objects;
+    private const int MarkEmpty = 0;
+    private const int MarkCircle = 1;
+    private const int MarkCross = 2;
+
+    private static int _nextMark = MarkCircle;
+
+    private const int StatusInplay = 0;
+    private const int StatusFinish = 1;
+
+    private static int _status = StatusInplay;
+
+    private static GameObject _srcObj;
+
+    private static readonly GameObject Circle = GameObject.Find("Circle");
+    private static readonly GameObject Cross = GameObject.Find("Cross");
+    private static readonly GameObject Canvas = GameObject.Find("Canvas");
+    private static readonly GameObject ResultText = GameObject.Find("ResultText");
+
+
+    private static int[] _board;
+    private static GameObject[] _objects;
 
     public static void Init()
     {
-        board = new int[]
+        Debug.Log("Board Init");
+        _board = new[]
         {
-            MARK_EMPTY, MARK_EMPTY, MARK_EMPTY,
-            MARK_EMPTY, MARK_EMPTY, MARK_EMPTY,
-            MARK_EMPTY, MARK_EMPTY, MARK_EMPTY,
+            MarkEmpty, MarkEmpty, MarkEmpty,
+            MarkEmpty, MarkEmpty, MarkEmpty,
+            MarkEmpty, MarkEmpty, MarkEmpty,
         };
-        objects = new GameObject[]
+        _objects = new GameObject[]
         {
-        null,null,null,
-        null,null,null,
-        null,null,null
+            null, null, null,
+            null, null, null,
+            null, null, null
         };
-        
     }
-    static int[,] lines   = new int[,]
+
+    private static readonly int[,] Lines = new int[,]
     {
-        { 0,1, 2 }, 
-        { 3, 4 ,5},
-        {  6,7,8 }, 
-        {  0,3,6 }, 
-        {  1,4,7 }, 
-        {  2,5,8 }, 
-        {  0,4,8 }, 
-        {  2,4,6 }, 
+        {0, 1, 2},
+        {3, 4, 5},
+        {6, 7, 8},
+        {0, 3, 6},
+        {1, 4, 7},
+        {2, 5, 8},
+        {0, 4, 8},
+        {2, 4, 6},
     };
 
-    static void Finish(int winmark)
+    private static void Finish(int winMark)
     {
         Debug.Log("Finish");
-        string winnerStr ;
-        if (winmark == MARK_CIRCLE)
-        {
-        winnerStr = "○";
-        }
-        else 
-        {
-        winnerStr = "×";
-        }
-        resultText.GetComponent<Text>().text = "Winner: " + winnerStr;
-        status = STATUS_FINISH;
+        var winnerStr = winMark == MarkCircle ? "○" : "×";
+
+        ResultText.GetComponent<Text>().text = "Winner: " + winnerStr;
+        _status = StatusFinish;
     }
-    static void CheckFinish()
+
+    private static void CheckFinish()
     {
         Debug.Log("CHECK FINISH");
-        for (var i=0;i < lines.GetLength(0); i++)
+        for (var i = 0; i < Lines.GetLength(0); i++)
         {
-            int square0 = lines[i, 0]; 
-            int square1 = lines[i, 1]; 
-            int square2 = lines[i, 2]; 
-            int mark0 = board[square0]; 
-            int mark1 = board[square1]; 
-            int mark2 = board[square2]; 
-            Debug.Log("squareID:"+square0+square1+square2+", mark:"+mark0+mark1+mark2);
-            
-            if ( 
-                mark0== MARK_CIRCLE && mark1== MARK_CIRCLE && mark2== MARK_CIRCLE )
+            var square0 = Lines[i, 0];
+            var square1 = Lines[i, 1];
+            var square2 = Lines[i, 2];
+            var mark0 = _board[square0];
+            var mark1 = _board[square1];
+            var mark2 = _board[square2];
+            Debug.Log("squareID:" + square0 + square1 + square2 + ", mark:" + mark0 + mark1 + mark2);
+
+            if (
+                mark0 == MarkCircle && mark1 == MarkCircle && mark2 == MarkCircle)
             {
-            Finish(MARK_CIRCLE);
-            break;
+                Finish(MarkCircle);
+                break;
             }
-            else if (
-               mark0 == MARK_CROSS && mark1 == MARK_CROSS && mark2 == MARK_CROSS)
+
+            if (
+                mark0 == MarkCross && mark1 == MarkCross && mark2 == MarkCross)
             {
-            Finish(MARK_CROSS);
-            break;
+                Finish(MarkCross);
+                break;
             }
-        Debug.Log("NO FINISH");
-            
+
+            Debug.Log("NO FINISH");
         }
     }
-    public static void Update(int squareId,Vector2 objPos )
-    {
-        if (board[squareId] != MARK_EMPTY) { return;}
 
-        if (status == STATUS_FINISH) { return;}
-        board[squareId] = nextMark;
-        
-        if (nextMark == MARK_CIRCLE)
+    public static void Update(int squareId, Vector2 objPos)
+    {
+        Debug.Log("Board Update");
+        if (_board[squareId] != MarkEmpty)
         {
-            srcObj = circle;
-            nextMark = MARK_CROSS;
+            return;
+        }
+
+        if (_status == StatusFinish)
+        {
+            return;
+        }
+
+        _board[squareId] = _nextMark;
+
+        if (_nextMark == MarkCircle)
+        {
+            _srcObj = Circle;
+            _nextMark = MarkCross;
         }
         else
         {
-            srcObj = cross;
-            nextMark = MARK_CIRCLE;
+            _srcObj = Cross;
+            _nextMark = MarkCircle;
         }
-        // Debug.Log("Click");
-        // Debug.Log("objPos:"+objPos.ToString());
-        // Debug.Log("squareId:"+squareId.ToString());
- 
-        GameObject newObj=GameObject.Instantiate(srcObj, objPos, circle.transform.rotation);
-        newObj.transform.SetParent(canvas.transform);
-        // newObj.transform.SetAsFirstSibling();
 
- 
+        var newObj = Object.Instantiate(_srcObj, objPos, Circle.transform.rotation);
+        newObj.transform.SetParent(Canvas.transform);
 
-        objects[squareId] = newObj;
+
+        _objects[squareId] = newObj;
         CheckFinish();
     }
 
     public static void Reset()
     {
-        foreach (var obj in objects)
+        foreach (var obj in _objects)
         {
             if (obj == null)
             {
                 continue;
             }
+
             Object.Destroy(obj);
         }
+
         Init();
-        status = STATUS_INPLAY;
-        resultText.GetComponent<Text>().text = "";
- 
+        _status = StatusInplay;
+        ResultText.GetComponent<Text>().text = "";
     }
 }
